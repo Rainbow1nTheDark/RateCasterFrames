@@ -1,6 +1,8 @@
 import { ethers } from "ethers";
 import { GraphQLClient, gql } from "graphql-request";
-import { SCHEMA_ID, GRAPH_ENDPOINT } from "../../config";
+
+const SCHEMA_ID = process.env.SCHEMA_ID;
+const GRAPH_ENDPOINT = process.env.GRAPH_ENDPOINT;
 
 const query = gql`
   query Attestation {
@@ -62,7 +64,7 @@ const fetchAttestations = async (): Promise<Attestation[]> => {
 };
 
 const decodeData = (data: string) => {
-  const abiCoder = new ethers.AbiCoder();
+  const abiCoder = new ethers.utils.AbiCoder();
   const decoded = abiCoder.decode(["bytes32", "uint8", "string"], data);
 
   return {
