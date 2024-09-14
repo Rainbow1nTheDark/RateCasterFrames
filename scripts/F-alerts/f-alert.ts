@@ -3,10 +3,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { fetchGraphQLRegisteredDapps } from '../graphQL/fetchFromSubgraph';
 import pQueue from 'p-queue';
 import { readFileFromS3, writeFileToS3 } from '../aws/s3Utils';
+import { addApp, getAllApps } from '../../app/database/apps';
 
 const DATA_FILE_KEY = 'farcaster-ids.json';
 const DAPPS_FILE_KEY = 'dapps.json';
 const WARPCAST_API_KEY = process.env.WARPCAST_API_KEY;
+const DEFAULT_ALERT_LEVEL = 1;
+const DEFAULT_PLATFORM = 'farcaster';
 
 // Initialize a queue with concurrency limit
 const queue = new pQueue({ interval: 60000, intervalCap: 5 }); // 5 messages per minute
@@ -70,17 +73,26 @@ export async function fetchAndStoreAllDapps() {
 }
 
 // Function to check for new Dapps and send alerts
-async function checkNewDappsAndAlert() {
+export async function checkNewDappsAndAlert() {
   try {
     const fileContent = await readFileFromS3(DAPPS_FILE_KEY);
     const storedDapps = JSON.parse(fileContent);
-    const storedDappIds = new Set(storedDapps.map((dapp: { id: string }) => dapp.id));
+    const storedDappIds = new Set(storedDapps.map((dapp: { id: string }) => dapp.id.toLowerCase()));
+    console.log("storedDapp", Array.from(storedDapps));
 
     const response = await fetchGraphQLRegisteredDapps();
     if (response && response.data.dappRegistereds) {
-      const newDapps = response.data.dappRegistereds.filter((dapp: { id: string }) => !storedDappIds.has(dapp.id));
+      console.log("response.data.dappRegistereds", Array.from(response.data.dappRegistereds));
+      const newDapps = response.data.dappRegistereds.filter((dapp: { id: string }) => {
+        const isNew = !storedDappIds.has(dapp.id.toLowerCase());
+        if (isNew) {
+          console.log(`New Dapp found: ${dapp.id}`);
+        }
+        return isNew;
+      });
 
       if (newDapps.length > 0) {
+        // Send alerts only for new Dapps
         for (const dapp of newDapps) {
           await sendMessagesToAllIds(`New Dapp registered: ${dapp.id}`);
         }
@@ -96,6 +108,65 @@ async function checkNewDappsAndAlert() {
     }
   } catch (error) {
     console.error('Error checking for new Dapps:', error);
+  }
+}
+
+// Function to fetch and store all Dapps in the database
+export async function fetchAndStoreAllDappsInDB() {
+  try {
+    const response = await fetchGraphQLRegisteredDapps();
+    if (response && response.data.dappRegistereds) {
+      const dapps = response.data.dappRegistereds;
+
+      for (const dapp of dapps) {
+        // Check if the dapp already exists in the database
+        const existingDapps = await getAllApps();
+        const existingDapp = existingDapps.find((existing: { dapp_id: string; }) => existing.dapp_id === dapp.id);
+
+        if (!existingDapp) {
+          // Insert the new dapp into the database
+          await addApp(dapp.name, dapp.image, dapp.id, DEFAULT_PLATFORM, dapp.url, dapp.description);
+          console.log(`New Dapp added: ${dapp.id}`);
+        }
+      }
+
+      console.log('All Dapps have been fetched and stored in the database');
+    }
+  } catch (error) {
+    console.error('Error fetching and storing Dapps in the database:', error);
+  }
+}
+
+export async function checkNewDappsAndPopulateDB() {
+  try {
+    const storedDapps = await getAllApps();
+    const storedDappIds = new Set(storedDapps.map((dapp: { dapp_id: string }) => dapp.dapp_id.toLowerCase()));
+    console.log("storedDapp", Array.from(storedDapps));
+
+    const response = await fetchGraphQLRegisteredDapps();
+    if (response && response.data.dappRegistereds) {
+      console.log("response.data.dappRegistereds", Array.from(response.data.dappRegistereds));
+      const newDapps = response.data.dappRegistereds.filter((dapp: { id: string }) => {
+        const isNew = !storedDappIds.has(dapp.id.toLowerCase());
+        if (isNew) {
+          console.log(`New Dapp found: ${dapp.id}`);
+        }
+        return isNew;
+      });
+
+      if (newDapps.length > 0) {
+        // Insert new Dapps into the database
+        for (const dapp of newDapps) {
+          await addApp(dapp.name, dapp.image, dapp.id, DEFAULT_PLATFORM, dapp.url, dapp.description);
+        }
+
+        console.log(`Processed ${newDapps.length} new Dapps`);
+      } else {
+        console.log('No new Dapps found');
+      }
+    }
+  } catch (error) {
+    console.error('Error checking for new Dapps and populating the database:', error);
   }
 }
 

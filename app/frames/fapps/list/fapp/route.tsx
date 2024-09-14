@@ -17,7 +17,7 @@ export const POST = frames(async (ctx) => {
 
     return {
         image: (
-            <div style={{ color: 'white', backgroundColor: '#7e5bc2', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '20px', height: '100%' }}>
+            <div style={{ width: '100%', color: 'white', backgroundColor: '#7e5bc2', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '20px', height: '100%' }}>
                 <h1 style={{ color: '#FFD700', marginBottom: '20px', fontSize: 64 }}>{appname}</h1>
                 <hr style={{ width: '100%', borderColor: 'white', marginBottom: '10px' }} />
                 <h2 style={{ color: 'white', marginBottom: '20px', fontSize: 48 }}>{dapp?.description}</h2>
@@ -25,12 +25,12 @@ export const POST = frames(async (ctx) => {
             </div>
         ),
         buttons: [
+            <Button action="post" target={{ pathname: baseUrl, query: { appname: appname, dappId: dapp?.dappId } }}>
+               Rate! 
+            </Button>,
             <Button action="link" target="https://www.ratecaster.xyz" >
                 {'Visit ' + (dapp?.name || '')}
             </Button>,
-            <Button action="post" target={{ pathname: baseUrl, query: { appname: appname, dappId: dapp?.dappId } }}>
-               Rate! 
-            </Button>
         ],
     };
 });

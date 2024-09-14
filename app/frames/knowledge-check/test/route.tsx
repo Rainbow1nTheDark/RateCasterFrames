@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 import { frames } from "../../frames";
 import { Button } from "frames.js/next";
-import { fetchGraphQLRegisteredDapps, DappRegistered } from '../../../../scripts/graphQL/fetchFromSubgraph'
+import { getRandomApps, DappRegistered } from '../../../database/apps'
 
 function parseButtonValue(buttonValue: string | undefined): number {
     // Check if buttonValue is undefined or null
@@ -29,15 +29,16 @@ export const POST = frames(async (ctx) => {
     let currentApp; 
 
     if (!selectedDapps.has(fid) || selectedDapps.get(fid)?.length === 0) {
-      const fetchedDapps = await fetchGraphQLRegisteredDapps();
+      const fetchedDapps = await getRandomApps();
+      console.log(fetchedDapps);
       if (fetchedDapps) {
-        const shuffledDapps = fetchedDapps.data.dappRegistereds.sort(() => 0.5 - Math.random());
+        
         // Take the first 5 elements from the shuffled array
-        selectedDapps.set(fid, shuffledDapps.slice(0, 5));
+        selectedDapps.set(fid, fetchedDapps);
       }
     }
     let _dapps = selectedDapps.get(fid);
-      
+
     if (_dapps) {
       currentApp = _dapps[counter];
     }
@@ -100,7 +101,7 @@ export const POST = frames(async (ctx) => {
               maxWidth: '80%',
               lineHeight: '1.6',
               marginTop: '10px'
-            }}>{currentApp?.description}</p>
+            }}>{`Score: ${score}`}</p>
           
             {/* Progress Bar */}
             <div style={{

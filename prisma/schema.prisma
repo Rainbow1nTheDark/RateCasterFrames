@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id            Int       @id @default(autoincrement())
+  fid            Int       @unique
+  username       String    @unique
+  daily_challenge String?
+  alert_level     Int?     @default(1) // 0 - off, 1 - every day, 2 - every week, 3 - every month
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+}
+
+model Scores {
+  id            Int       @id @default(autoincrement())
+  fid           Int
+  todays_score  Int       @default(0)
+  total_score   Int       @default(0)
+  created_at    DateTime  @default(now())
+}
+
+model Apps {
+  id            Int       @id @default(autoincrement())
+  name          String
+  image         String?
+  dapp_id       String    @unique
+  platform      String
+  url           String
+  description   String?
+  created_at    DateTime  @default(now())
+}
