@@ -18,7 +18,6 @@ const config = createConfig({
         functionName: "getAllDapps",
       });
   
-      console.log("DApp data received:", dappData);
   
       return dappData as DappRegistered[];
     } catch (error) {

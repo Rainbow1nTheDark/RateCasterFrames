@@ -85,7 +85,6 @@ export async function checkNewDappsAndAlert() {
   try {
     const storedDapps = await getAllApps();
     const storedDappIds = new Set(storedDapps.map((dapp: { dapp_id: string }) => dapp.dapp_id.toLowerCase()));
-    console.log("storedDapp", Array.from(storedDapps));
 
     const dapps = await fetchAllDapps(); // Use the new function
     const newDapps = dapps.filter((dapp: { dappId: string }) => {
