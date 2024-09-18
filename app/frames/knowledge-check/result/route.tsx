@@ -158,7 +158,7 @@ export const POST = frames(async (ctx) => {
                 marginTop: '-10px',
                 display: 'flex',
             }}>
-                Today's Rating
+                Today&apos;s Rating
             </div>
         </div>              
                 <div style={{
