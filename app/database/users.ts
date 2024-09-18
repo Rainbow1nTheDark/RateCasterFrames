@@ -3,10 +3,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Function to add a new user
-export async function addUser(username: string, daily_challenge: string | null) {
+export async function addUser(fid: number, username: string, daily_challenge: string | null) {
   try {
     const user = await prisma.users.create({
       data: {
+        fid,
         username,
         daily_challenge,
       },

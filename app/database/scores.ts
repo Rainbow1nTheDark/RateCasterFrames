@@ -145,33 +145,36 @@ export async function getUserTotalScoreAndLeaderboardPosition(fid: number) {
   }
 
   // Function to get the leaderboard with pagination and search functionality
-  export async function getLeaderboard(page: number, search: string) {
+  export async function getLeaderboard(page: number) {
     const PAGE_SIZE = 10;
     try {
-      const where = search
-        ? {
-            fid: parseInt(search, 10) || undefined,
-          }
-        : {};
+      const leaderboard = await prisma.$queryRaw<
+        { fid: number; total_score: number }[]
+      >`
+        SELECT fid, MAX(total_score) as total_score
+        FROM scores
+        GROUP BY fid
+        ORDER BY total_score DESC
+        LIMIT ${PAGE_SIZE}
+        OFFSET ${(page - 1) * PAGE_SIZE}
+      `;
   
-      const leaderboard = await prisma.scores.findMany({
-        where,
-        orderBy: {
-          total_score: 'desc',
-        },
-        skip: (page - 1) * PAGE_SIZE,
-        take: PAGE_SIZE,
-        select: {
-          fid: true,
-          total_score: true,
-        },
-      });
-  
-      const totalRecords = await prisma.scores.count({ where });
+      const totalRecordsResult = await prisma.$queryRaw<
+        { count: bigint }[]
+      >`
+        SELECT COUNT(DISTINCT fid) as count
+        FROM scores
+      `;
+      console.log(totalRecordsResult);
+      const totalRecords = Number(totalRecordsResult[0]?.count || 0);
       const totalPages = Math.ceil(totalRecords / PAGE_SIZE);
   
       return {
-        leaderboard,
+        leaderboard: leaderboard.map(entry => ({
+          ...entry,
+          fid: Number(entry.fid), // Ensure fid is a number
+          total_score: Number(entry.total_score) // Ensure total_score is a number
+        })),
         totalPages,
         currentPage: page,
       };

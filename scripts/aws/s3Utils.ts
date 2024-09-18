@@ -2,9 +2,9 @@ import AWS from 'aws-sdk';
 
 // Configure AWS SDK
 const s3 = new AWS.S3({
-  accessKeyId: 'AKIAXWMA6QLGTLAOE2HF', //process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: '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', //process.env.AWS_SECRET_ACCESS_KEY,
-  region: 'us-east-2', //process.env.AWS_REGION,
+  accessKeyId: '',//process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: '',//process.env.AWS_SECRET_ACCESS_KEY,
+  region: ''//process.env.AWS_REGION,
 });
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;

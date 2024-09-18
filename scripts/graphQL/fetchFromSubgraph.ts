@@ -1,6 +1,6 @@
 
 const ALCHEMY_SUBGRAPH_KEY = process.env.ALCHEMY_SUBGRAPH_API_KEY;
-const ENDPOINT_DAPP_RATING_SYSTEM = `https://subgraph.satsuma-prod.com/${ALCHEMY_SUBGRAPH_KEY}/123s-team--264305/rate-caster-basesepolia-v2/api`;
+const ENDPOINT_DAPP_RATING_SYSTEM = `https://subgraph.satsuma-prod.com/${ALCHEMY_SUBGRAPH_KEY}/alexanders-team--782474/ratecaster/version/v0.0.1-new-version/api`;
 //const ENDPOINT_DAPP_RATER_SCHEMA_RESOLVER = `https://subgraph.satsuma-prod.com/${ALCHEMY_SUBGRAPH_KEY}/alexanders-team--782474/DappRaterSchemaResolver/api`;
 
 // Define a TypeScript type for the function parameters
