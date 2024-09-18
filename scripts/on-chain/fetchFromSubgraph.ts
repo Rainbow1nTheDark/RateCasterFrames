@@ -40,12 +40,14 @@ async function fetchGraphQL<T>(config: GraphQLRequestConfig): Promise<GraphQLRes
 
 // Usage example with specific type for the response data
 export type DappRegistered = {
-  id: string;
+  imageUrl: string | null;
   dappId: string;
   description: string;
   name: string;
   url: string;
   averageRating?: number;
+  platform?: string;
+  category?: string;
 };
 
 export type DappRating = {

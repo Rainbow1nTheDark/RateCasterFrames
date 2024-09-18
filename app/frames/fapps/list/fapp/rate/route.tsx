@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-import { DappRegistered, fetchGraphQLRegisteredDapps } from "../../../../../../scripts/graphQL/fetchFromSubgraph";
+import { DappRegistered, fetchGraphQLRegisteredDapps } from "../../../../../../scripts/on-chain/fetchFromSubgraph";
 import { frames } from "../../../../frames";
 import { Button } from "frames.js/next";
 

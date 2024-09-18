@@ -96,7 +96,7 @@ export const POST = frames(async (ctx) => {
             }}>{currentApp?.name}</h2>
           
             <p style={{
-              color: 'rgba(255,255,255,0.8)',
+              color: '#FFD700',
               fontSize: '1.2em', // Further reduced font size
               maxWidth: '80%',
               lineHeight: '1.6',

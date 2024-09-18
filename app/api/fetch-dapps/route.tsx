@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkNewDappsAndAlert } from '../../../scripts/F-alerts/f-alert';
+import { fetchAndStoreAllDappsInDB } from '../../../scripts/F-alerts/f-alert';
 
 export async function GET(req: NextRequest) {
   try {
-    await checkNewDappsAndAlert();
+    await fetchAndStoreAllDappsInDB();
     return NextResponse.json({ message: 'Dapps fetched and stored successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error fetching and storing Dapps:', error);

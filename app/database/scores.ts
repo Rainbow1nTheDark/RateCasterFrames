@@ -183,3 +183,18 @@ export async function getUserTotalScoreAndLeaderboardPosition(fid: number) {
       throw new Error('Failed to fetch leaderboard');
     }
   }
+
+  export async function getDistinctFids() {
+    try {
+        const distinctFids = await prisma.scores.findMany({
+            distinct: ['fid'],
+            select: {
+                fid: true,
+            },
+        });
+        return distinctFids.map(entry => entry.fid); // Return an array of distinct fids
+    } catch (error) {
+        console.error('Failed to fetch distinct FIDs:', error);
+        throw new Error('Failed to fetch distinct FIDs');
+    }
+}
