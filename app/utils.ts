@@ -9,28 +9,28 @@ export function currentURL(pathname: string): URL {
     return new URL(pathname, `${protocol}://${host}`);
   } catch (error) {
     console.error(error);
-    return new URL("http://localhost:3000");
+    return new URL(pathname, appURL());
   }
 }
 
-export function appURL() {
+export function appURL(): string {
   if (process.env.APP_URL) {
     return process.env.APP_URL;
-  } else {
-    const url = process.env.APP_URL || vercelURL() || "http://localhost:3000";
-    console.warn(
-      `Warning (examples): APP_URL environment variable is not set. Falling back to ${url}.`
-    );
-    return url;
   }
+  
+  const url = vercelURL() || "http://localhost:3000";
+  console.warn(
+    `Warning: APP_URL environment variable is not set. Falling back to ${url}.`
+  );
+  return url;
 }
 
-export function vercelURL() {
+export function vercelURL(): string | undefined {
   return process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : undefined;
 }
 
-export function createExampleURL(path: string) {
+export function createExampleURL(path: string): string {
   return new URL(path, appURL()).toString();
 }
