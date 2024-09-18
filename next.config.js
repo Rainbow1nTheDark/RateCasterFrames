@@ -1,9 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // prevent double render on dev mode, which causes 2 frames to exist
   reactStrictMode: false,
   images: {
-    minimumCacheTTL: 1, // to allow dynamic images in case you are previewing them using next/image
+    minimumCacheTTL: 1,
     remotePatterns: [
       {
         hostname: "*",
@@ -11,6 +10,10 @@ const nextConfig = {
       },
       {
         hostname: "*",
+        protocol: "https",
+      },
+      {
+        hostname: new URL(process.env.APP_URL || 'https://frames.ratecaster.xyz').hostname,
         protocol: "https",
       },
     ],

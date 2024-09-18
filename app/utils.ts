@@ -13,24 +13,28 @@ export function currentURL(pathname: string): URL {
   }
 }
 
-export function appURL(): string {
-  if (process.env.APP_URL) {
-    return process.env.APP_URL;
-  }
+// export function appURL(): string {
+//   if (process.env.APP_URL) {
+//     return process.env.APP_URL;
+//   }
   
-  const url = vercelURL() || "http://localhost:3000";
-  console.warn(
-    `Warning: APP_URL environment variable is not set. Falling back to ${url}.`
-  );
-  return url;
+//   const url = vercelURL() || "http://localhost:3000";
+//   console.warn(
+//     `Warning: APP_URL environment variable is not set. Falling back to ${url}.`
+//   );
+//   return url;
+// }
+
+export function appURL(): string {
+  return process.env.APP_URL || `https://${headers().get('host')}`;
+}
+
+export function createExampleURL(path: string): string {
+  return new URL(path, appURL()).toString();
 }
 
 export function vercelURL(): string | undefined {
   return process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : undefined;
-}
-
-export function createExampleURL(path: string): string {
-  return new URL(path, appURL()).toString();
 }
