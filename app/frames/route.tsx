@@ -6,7 +6,7 @@ import { appURL } from "../utils";
 const frameHandler = frames(async (ctx) => {
   // Randomly assign the counter to 0 or -0
   let initialCounter = Math.random() < 0.5 ? 0 : -0;
-  let actionUrl = `${appURL()}/knowledge-check/test`;
+  let actionUrl = `/knowledge-check/test`;
   console.log(actionUrl);
   return {
     image: (
@@ -52,6 +52,7 @@ const frameHandler = frames(async (ctx) => {
         Play!
       </Button>,
     ],
+    postUrl: appURL()
   };
 });
 

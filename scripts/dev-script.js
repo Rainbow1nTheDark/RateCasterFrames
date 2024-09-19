@@ -2,6 +2,8 @@ import "dotenv/config";
 import { spawn } from "node:child_process";
 import isPortReachable from "is-port-reachable";
 
+console.log("Running Environment", process.env.NODE_ENV);
+
 function snakeCaseToTitleCase(snakeCase) {
   return snakeCase
     .split("-")
