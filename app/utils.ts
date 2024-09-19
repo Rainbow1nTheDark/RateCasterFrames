@@ -1,17 +1,4 @@
-import { headers } from "next/headers";
 
-export function currentURL(pathname: string): URL {
-  try {
-    const headersList = headers();
-    const host = headersList.get("x-forwarded-host") || headersList.get("host");
-    const protocol = headersList.get("x-forwarded-proto") || "http";
-
-    return new URL(pathname, `${protocol}://${host}`);
-  } catch (error) {
-    console.error(error);
-    return new URL("http://localhost:3000");
-  }
-}
 
 export function appURL() {
   if (process.env.APP_URL) {
@@ -32,5 +19,9 @@ export function vercelURL() {
 }
 
 export function createExampleURL(path: string) {
-  return new URL(path, appURL()).toString();
+  const baseUrl = appURL();
+  console.log('Base URL:', baseUrl);
+  const fullUrl = new URL(path, baseUrl).toString();
+  console.log('Full URL:', fullUrl);
+  return fullUrl;
 }
