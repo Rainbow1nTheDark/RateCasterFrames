@@ -7,7 +7,8 @@ const frameHandler = frames(async (ctx) => {
   // Randomly assign the counter to 0 or -0
   let initialCounter = Math.random() < 0.5 ? 0 : -0;
   let actionUrl = `/knowledge-check/test`;
-  console.log(actionUrl);
+  console.log('Context URL:', ctx.url); // Log the context URL
+  console.log('Action URL:', actionUrl); // Log the action URL
   return {
     image: (
       <div style={{
@@ -52,7 +53,7 @@ const frameHandler = frames(async (ctx) => {
         Play!
       </Button>,
     ],
-    postUrl: appURL()
+    postUrl: 'http://frames.ratecaster.xyz/frames'
   };
 });
 
