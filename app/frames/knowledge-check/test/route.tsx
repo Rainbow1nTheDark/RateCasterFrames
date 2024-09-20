@@ -127,7 +127,7 @@ export const POST = frames(async (ctx) => {
       <Button action="post" target={{ pathname: nextUrl, query: { counter: nextCounter, score: score + 20 } }} >
         Yes
       </Button>,
-      <Button action="post" target={{ pathname: '/fapps/list/fapp', query: { dappId: currentApp?.dapp_id, fapp: currentApp?.name }}} >
+      <Button action="post" target={{ pathname: '/fapps/list/fapp/rate', query: { dappId: currentApp?.dapp_id, appname: currentApp?.name }}} >
        Rate App
      </Button>,
        <Button action="post" target={{ pathname: nextUrl, query: { counter: nextCounter, score: Math.max(score - 20, 0) } }} >
