@@ -46,7 +46,7 @@ export type DappRegistered = {
   name: string;
   url: string;
   averageRating?: number;
-  platform?: string;
+  platform: string;
   category?: string;
 };
 

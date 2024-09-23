@@ -2,7 +2,7 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchAllDapps } from '../on-chain/fetchOnchain'; // Import the new function
 import pQueue from 'p-queue';
-import { addApp, getAllApps } from '../../app/database/apps';
+import { addApp, DappRegistered, getAllApps } from '../../app/database/apps';
 import { getDistinctFids } from '../../app/database/scores';
 
 const WARPCAST_API_KEY = process.env.WARPCAST_API_KEY;
@@ -67,7 +67,7 @@ export async function fetchAndStoreAllDappsInDB() {
 
       if (!existingDapp) {
         // Insert the new dapp into the database
-        await addApp(dapp.name, dapp.imageUrl, dapp.dappId, DEFAULT_PLATFORM, dapp.url, dapp.description);
+        await addApp(dapp.name, dapp.imageUrl, dapp.dappId, dapp.platform, dapp.url, dapp.description);
         console.log(`New Dapp added: ${dapp.dappId}`);
         const message = `New Farcaster ${dapp.category ? dapp.category.charAt(0).toUpperCase() + dapp.category.slice(1) : 'App'} Released: ${dapp.name}\n`;
         sendMessagesToAllIds(message);
@@ -83,7 +83,7 @@ export async function fetchAndStoreAllDappsInDB() {
 // Function to check for new Dapps and send alerts
 export async function checkNewDappsAndAlert() {
   try {
-    const storedDapps = await getAllApps();
+    const storedDapps: DappRegistered[] = await getAllApps();
     const storedDappIds = new Set(storedDapps.map((dapp: { dapp_id: string }) => dapp.dapp_id.toLowerCase()));
 
     const dapps = await fetchAllDapps(); // Use the new function
@@ -103,7 +103,7 @@ export async function checkNewDappsAndAlert() {
 
       // Update the stored Dapps in the database
       for (const dapp of newDapps) {
-        await addApp(dapp.name, dapp.imageUrl, dapp.dappId, DEFAULT_PLATFORM, dapp.url, dapp.description);
+        await addApp(dapp.name, dapp.imageUrl, dapp.dappId, dapp.platform, dapp.url, dapp.description);
       }
 
       console.log(`Processed ${newDapps.length} new Dapps`);
