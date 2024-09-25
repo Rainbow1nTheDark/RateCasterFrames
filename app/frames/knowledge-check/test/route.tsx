@@ -134,7 +134,7 @@ export const POST = frames(async (ctx) => {
           <Button 
             action="post" 
             target={{ 
-              pathname: '/frames/rate', 
+              pathname: '/fapps/list/fapp/rate', 
               query: { 
                 dappId: currentApp?.dapp_id, 
                 appname: currentApp?.name 

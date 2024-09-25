@@ -17,7 +17,7 @@ const scoringSystem: ScoreDescription[] = [
         description: "Woo, You're an Expert Today!",
         farcasterRole: "Comeback Tomorrow for More!",
         buttonText: "Leaderboard",
-        target: "/leaderboard"
+        target: "https://www.ratecaster.xyz/leaderboard"
     },
     {
         score: 80,
@@ -92,7 +92,7 @@ export const POST = frames(async (ctx) => {
     console.log("fid", fid);
 
     // Get user's total score and leaderboard position
-    const { totalScore, leaderboardPosition } = await getUserTotalScoreAndLeaderboardPosition(fid);
+    const { leaderboardPosition } = await getUserTotalScoreAndLeaderboardPosition(fid);
 
     return {
         image: (
@@ -174,13 +174,15 @@ export const POST = frames(async (ctx) => {
             </div>
         ),
         buttons: [
-            <Button action="post" target={{ pathname: first_button_target, query: { fid: fid } }} >
+            <Button 
+                action={score === 100 ? "link" : "post"} 
+                target={score === 100 ? first_button_target : { pathname: first_button_target, query: { fid: fid } }}
+            >
                 {first_button_name}
             </Button>,
             <Button action="link" target="https://www.ratecaster.xyz" >
                 Add Your App
             </Button>,
-            
         ],
     };
 });

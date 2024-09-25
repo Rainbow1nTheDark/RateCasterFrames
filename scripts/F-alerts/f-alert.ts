@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { fetchAllDapps } from '../on-chain/fetchOnchain'; // Import the new function
+import { fetchAllDapps } from '../on-chain/fetchOnchain';
 import pQueue from 'p-queue';
 import { addApp, DappRegistered, getAllApps } from '../../app/database/apps';
 import { getDistinctFids } from '../../app/database/scores';
+import cron from 'node-cron';
 
 const WARPCAST_API_KEY = process.env.WARPCAST_API_KEY;
 const DEFAULT_ALERT_LEVEL = 1;
@@ -41,11 +42,12 @@ async function sendDirectMessage(recipientFid: number, message: string) {
 // Function to send messages to all IDs in the database
 async function sendMessagesToAllIds(message: string) {
   try {
-    const allApps = await getAllApps();
     const recipientFids = await getDistinctFids();
 
     for (const recipientFid of recipientFids) {
-      queue.add(() => sendDirectMessage(Number(recipientFid), message)); // Convert string to number
+      if (DEFAULT_ALERT_LEVEL > 0) {
+        queue.add(() => sendDirectMessage(Number(recipientFid), message));
+      }
     }
 
     await queue.onIdle(); // Wait for the queue to be empty
@@ -56,68 +58,66 @@ async function sendMessagesToAllIds(message: string) {
 }
 
 // Function to fetch and store all Dapps in the database
-export async function fetchAndStoreAllDappsInDB() {
+async function fetchAndStoreAllDappsInDB() {
   try {
-    const dapps = await fetchAllDapps(); // OnChain
+    const dapps = await fetchAllDapps();
+    const existingDapps = await getAllApps();
+    const existingDappIds = new Set(existingDapps.map((dapp: { dapp_id: string }) => dapp.dapp_id.toLowerCase()));
+
+    let newDappsCount = 0;
 
     for (const dapp of dapps) {
-      // Check if the dapp already exists in the database
-      const existingDapps = await getAllApps();
-      const existingDapp = existingDapps.find((existing: { dapp_id: string; }) => existing.dapp_id === dapp.dappId);
-
-      if (!existingDapp) {
-        // Insert the new dapp into the database
+      if (!existingDappIds.has(dapp.dappId.toLowerCase())) {
         await addApp(dapp.name, dapp.imageUrl, dapp.dappId, dapp.platform, dapp.url, dapp.description);
-        console.log(`New Dapp added: ${dapp.dappId}`);
-        const message = `New Farcaster ${dapp.category ? dapp.category.charAt(0).toUpperCase() + dapp.category.slice(1) : 'App'} Released: ${dapp.name}\n`;
-        sendMessagesToAllIds(message);
+        newDappsCount++;
       }
     }
 
-    console.log('All Dapps have been fetched and stored in the database');
+    if (newDappsCount > 0) {
+      const message = `We got More Apps, Check and Rate them out at https://frames.ratecaster.xyz/frames !`;
+      await sendMessagesToAllIds(message);
+    }
+
+    console.log(`Fetched and stored ${newDappsCount} new Dapps in the database`);
   } catch (error) {
     console.error('Error fetching and storing Dapps in the database:', error);
   }
 }
 
 // Function to check for new Dapps and send alerts
-export async function checkNewDappsAndAlert() {
+async function checkNewDappsAndAlert() {
   try {
-    const storedDapps: DappRegistered[] = await getAllApps();
-    const storedDappIds = new Set(storedDapps.map((dapp: { dapp_id: string }) => dapp.dapp_id.toLowerCase()));
-
-    const dapps = await fetchAllDapps(); // Use the new function
-    const newDapps = dapps.filter((dapp: { dappId: string }) => {
-      const isNew = !storedDappIds.has(dapp.dappId.toLowerCase());
-      if (isNew) {
-        console.log(`New Dapp found: ${dapp.dappId}`);
-      }
-      return isNew;
-    });
-
-    if (newDapps.length > 0) {
-      // Send alerts only for new Dapps
-      for (const dapp of newDapps) {
-        await sendMessagesToAllIds(`New Dapp registered: ${dapp.dappId}`);
-      }
-
-      // Update the stored Dapps in the database
-      for (const dapp of newDapps) {
-        await addApp(dapp.name, dapp.imageUrl, dapp.dappId, dapp.platform, dapp.url, dapp.description);
-      }
-
-      console.log(`Processed ${newDapps.length} new Dapps`);
-    } else {
-      console.log('No new Dapps found');
-    }
+    await fetchAndStoreAllDappsInDB();
   } catch (error) {
     console.error('Error checking for new Dapps:', error);
   }
 }
 
-// Function to periodically check for new Dapps
+// Function to start the periodic check based on alert levels
 function startPeriodicCheck() {
-  setInterval(checkNewDappsAndAlert, 3600000); // Check every 1 hour
+  // Daily check at 9 AM EST
+  cron.schedule('0 9 * * *', async () => {
+    console.log('Running daily check for new Dapps');
+    await checkNewDappsAndAlert();
+  }, {
+    timezone: "America/New_York"
+  });
+
+  // Weekly check (every Monday at 9 AM EST)
+  cron.schedule('0 9 * * 1', async () => {
+    console.log('Running weekly check for new Dapps');
+    await checkNewDappsAndAlert();
+  }, {
+    timezone: "America/New_York"
+  });
+
+  // Monthly check (1st day of each month at 9 AM EST)
+  cron.schedule('0 9 1 * *', async () => {
+    console.log('Running monthly check for new Dapps');
+    await checkNewDappsAndAlert();
+  }, {
+    timezone: "America/New_York"
+  });
 }
 
 // Initial fetch and store of all Dapps
@@ -125,8 +125,4 @@ fetchAndStoreAllDappsInDB().then(() => {
   startPeriodicCheck();
 });
 
-// // Example usage
-// export async function exampleUsage() {
-//   const message = 'This is a programmatic Direct Cast';
-//   await sendMessagesToAllIds(message);
-// }
+export { checkNewDappsAndAlert };
