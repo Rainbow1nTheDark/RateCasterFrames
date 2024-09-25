@@ -125,4 +125,4 @@ fetchAndStoreAllDappsInDB().then(() => {
   startPeriodicCheck();
 });
 
-export { checkNewDappsAndAlert };
+export { checkNewDappsAndAlert, fetchAndStoreAllDappsInDB };
