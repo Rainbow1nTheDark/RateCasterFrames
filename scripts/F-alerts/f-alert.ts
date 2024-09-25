@@ -2,7 +2,7 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchAllDapps } from '../on-chain/fetchOnchain';
 import pQueue from 'p-queue';
-import { addApp, DappRegistered, getAllApps } from '../../app/database/apps';
+import { addApp, getAllApps } from '../../app/database/apps';
 import { getDistinctFids } from '../../app/database/scores';
 import cron from 'node-cron';
 

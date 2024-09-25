@@ -19,7 +19,7 @@ export const POST = frames(async (ctx) => {
   
   // Return transaction data that conforms to the correct type
   return transaction({
-    chainId: `eip155:${CURRENT_CHAIN_ID}`, // Base Sepolia
+    chainId: `eip155:${CURRENT_CHAIN_ID}`,
     method: "eth_sendTransaction",
     params: {
       abi: DAPP_RATING_SYSTEM_CONTRACT_ABI as Abi,
