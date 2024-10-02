@@ -1,13 +1,29 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Frame } from "frames.js";
+
+const initialFrame: Frame = {
+  image: "/base_screen.png",
+  version: "vNext",
+  buttons: [
+    {
+      label: "Start Quiz",
+      action: "post"
+    },
+  ],
+  postUrl: `${process.env.APP_URL}/frames`,
+};
 
 export const metadata: Metadata = {
-  // without a title, warpcast won't validate your frame
   title: "RateCaster",
   description: "Check your knowledge and Rate",
-  icons: {
-    icon: [{ url: "/logo.jpg", sizes: "32x32", type: "image/png" }],
+  openGraph: {
+    title: "RateCaster",
+    description: "Check your knowledge and Rate Apps",
   },
+  other: Object.fromEntries(
+    Object.entries(initialFrame).map(([key, value]) => [key, value?.toString() ?? ''])
+  ),
 };
 
 export default function RootLayout({
