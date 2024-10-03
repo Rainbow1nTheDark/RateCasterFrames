@@ -61,3 +61,17 @@ export async function getRandomApps(): Promise<DappRegistered[]> {
     throw new Error('Failed to fetch random apps');
   }
 }
+
+export async function getRandomApp(): Promise<DappRegistered | undefined> {
+  try {
+    const apps = await prisma.$queryRaw<DappRegistered[]>`SELECT * FROM apps WHERE platform = 'farcaster' and image != '' ORDER BY RANDOM() LIMIT 1`;
+    
+    if (apps.length === 0) {
+      throw new Error('No apps found');
+    }
+    
+    return apps[0]; // Return the first (and only) app in the array
+  } catch (error) {
+    throw new Error('Failed to fetch random app');
+  }
+}
