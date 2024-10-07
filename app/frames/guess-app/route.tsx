@@ -53,7 +53,7 @@ export const POST = frames(async (ctx) => {
                 </div>
             ),
             buttons: [
-                <Button key="result-button" action="post" target={{ pathname: '/guess-app/leaderboard', query: { score: currentScore }  }}>
+                <Button key="result-button" action="post" target={{ pathname: '/guess-app/leaderboard', query: { score: currentScore, dappId: currentDailyApp.dapp_id, appname: currentDailyApp.name }  }}>
                     See Results
                 </Button>
             ]
@@ -66,7 +66,7 @@ export const POST = frames(async (ctx) => {
                 </div>
             ),
             buttons: [
-                <Button key="result-button" action="post" target={{ pathname: '/guess-app/leaderboard', query: { score: currentScore }  }}>
+                <Button key="result-button" action="post" target={{ pathname: '/guess-app/leaderboard', query: { score: currentScore, dappId: currentDailyApp.dapp_id, appname: currentDailyApp.name }  }}>
                     See Results
                 </Button>
             ]

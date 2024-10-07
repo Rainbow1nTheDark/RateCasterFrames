@@ -15,6 +15,8 @@ async function getUsername(fid: number): Promise<string> {
 
 export const POST = frames(async (ctx) => {
     const fid = ctx.message?.requesterFid || 0;
+    const dappId = ctx.searchParams.dappId as string;
+    const appname = ctx.searchParams.appname as string;
     const score = parseInt(ctx.searchParams.score as string) || 0;
     // Add the score to the database
     console.log("fid", fid);
@@ -98,9 +100,19 @@ export const POST = frames(async (ctx) => {
             </div>
         ),
         buttons: [
-            <Button key="back-home" action="post" target="/guess-app">
-                Back to Home
-            </Button>,
+            <Button 
+            key="rate-app"
+            action="post" 
+            target={{ 
+              pathname: '/fapps/list/fapp/rate', 
+              query: { 
+                dappId: dappId, 
+                appname: appname 
+              }
+            }} 
+          >
+            {`Rate ${appname}!`}
+          </Button>,
             <Button key="full-leaderboard" action="link" target="https://www.ratecaster.xyz/leaderboard">
                 Full Leaderboard
             </Button>,
