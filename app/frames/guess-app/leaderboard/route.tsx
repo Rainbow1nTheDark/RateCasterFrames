@@ -1,4 +1,4 @@
-import { frames } from "../../frames";
+import { frames,  } from "../../frames";
 import { Button } from "frames.js/next";
 import { addScore, getTopLeaders, getUserTotalScoreAndLeaderboardPosition } from "../../../database/scores";
 
@@ -98,10 +98,10 @@ export const POST = frames(async (ctx) => {
             </div>
         ),
         buttons: [
-            <Button action="post" target="/">
+            <Button key="back-home" action="post" target="/guess-app">
                 Back to Home
             </Button>,
-            <Button action="link" target="https://www.ratecaster.xyz/leaderboard">
+            <Button key="full-leaderboard" action="link" target="https://www.ratecaster.xyz/leaderboard">
                 Full Leaderboard
             </Button>,
         ],
