@@ -29,13 +29,14 @@ export const POST = frames(async (ctx) => {
     const userGuess = ctx.message?.inputText?.toLowerCase();
     const correctAppName = currentDailyApp.name.toLowerCase();
 
-    let buttonLabel = 'Submit';
+    let buttonLabel = 'Play!';
     let showImage = attempts >= 2;
     let isCorrect = false;
     let showTryAgain = false;
     let currentScore = Math.round(100 / attempts);
 
     if (userGuess) {
+        buttonLabel = 'Guess';
         console.log('User guess:', userGuess);
         console.log('Correct app name:', correctAppName);
         isCorrect = userGuess === correctAppName;
