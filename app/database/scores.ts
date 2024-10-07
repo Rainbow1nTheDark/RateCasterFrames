@@ -198,3 +198,25 @@ export async function getUserTotalScoreAndLeaderboardPosition(fid: number) {
         throw new Error('Failed to fetch distinct FIDs');
     }
 }
+
+export async function getTopLeaders(n: number = 3) {
+  try {
+    const topLeaders = await prisma.$queryRaw<
+      { fid: number; total_score: number }[]
+    >`
+      SELECT fid, MAX(total_score) as total_score
+      FROM scores
+      GROUP BY fid
+      ORDER BY total_score DESC
+      LIMIT ${n}
+    `;
+
+    return topLeaders.map(leader => ({
+      fid: Number(leader.fid),
+      totalScore: Number(leader.total_score)
+    }));
+  } catch (error) {
+    console.error('Failed to fetch top leaders:', error);
+    throw new Error('Failed to fetch top leaders');
+  }
+}

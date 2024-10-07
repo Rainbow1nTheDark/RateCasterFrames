@@ -26,142 +26,179 @@ export const POST = frames(async (ctx) => {
     }
 
     const attempts = parseButtonValue(ctx.searchParams.attempts);
+    const userGuess = ctx.message?.inputText?.toLowerCase();
+    const correctAppName = currentDailyApp.name.toLowerCase();
 
-    let buttonLabel = 'Show Hint';
-    let showImage = false;
+    let buttonLabel = 'Submit';
+    let showImage = attempts >= 2;
+    let isCorrect = false;
+    let showTryAgain = false;
+    let currentScore = Math.round(100 / attempts);
 
-    if (attempts === 1) {
-        buttonLabel = 'Next Hint';
-    } else if (attempts >= 2) {
-        showImage = true;
-        buttonLabel = 'Submit';
+    if (userGuess) {
+        console.log('User guess:', userGuess);
+        console.log('Correct app name:', correctAppName);
+        isCorrect = userGuess === correctAppName;
+        showTryAgain = !isCorrect;
+    } else if (userGuess == ''){
+        isCorrect = false;
+        showTryAgain = true;
+    }
+
+    if (isCorrect) {
+        return {
+            image: (
+                <div style={{ width: '1200px', height: '628px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#7e5bc2', color: '#FFD700', fontSize: '64px', fontWeight: 'bold' }}>
+                    Correct! You Are Right!
+                </div>
+            ),
+            buttons: [
+                <Button key="result-button" action="post" target={{ pathname: '/guess-app/leaderboard', query: { score: currentScore }  }}>
+                    See Results
+                </Button>
+            ]
+        };
+    } else if (!isCorrect && attempts == 3) {
+        return {
+            image: (
+                <div style={{ width: '1200px', height: '628px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#7e5bc2', color: '#FFD700', fontSize: '64px', fontWeight: 'bold' }}>
+                    Not This Time
+                </div>
+            ),
+            buttons: [
+                <Button key="result-button" action="post" target={{ pathname: '/guess-app/leaderboard', query: { score: currentScore }  }}>
+                    See Results
+                </Button>
+            ]
+        };
     }
 
     return {
-      image: (
-          <div style={{
-              color: 'white',
-              backgroundColor: '#7e5bc2',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              width: '1200px',
-              height: '628px',
-              padding: '20px',
-              position: 'relative',
-            }}>
-              <h1 style={{
-                color: '#FFD700', 
-                fontSize: '64px',
-                fontWeight: 'bold', 
-                textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
-                textAlign: 'center',
-                marginBottom: '40px',
-                marginLeft: '43%',
-                width: '100%',
-              }}>Guess Farcaster App!</h1>
-              <div style={{
+        image: (
+            <div style={{
+                color: 'white',
+                backgroundColor: '#7e5bc2',
                 display: 'flex',
-                justifyContent: 'center',
-                width: '100%',
-                flex: 1,
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '1200px',
+                height: '628px',
+                padding: '20px',
+                position: 'relative',
               }}>
+                <h1 style={{
+                  color: '#FFD700', 
+                  fontSize: '64px',
+                  fontWeight: 'bold', 
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+                  textAlign: 'center',
+                  marginBottom: '40px',
+                  marginLeft: '43%',
+                  width: '100%',
+                }}>Guess Farcaster App!</h1>
                 <div style={{
-                  flex: 1,
-                  maxWidth: '45%',
                   display: 'flex',
                   justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRight: '2px solid #FFD700',
-                  paddingRight: '20px',
-                }}>
-                  {showImage && currentDailyApp.image ? (
-                    <img 
-                      src={currentDailyApp.image} 
-                      width={250} 
-                      height={250} 
-                      alt={currentDailyApp.name}
-                      style={{
-                        objectFit: 'contain',
-                        maxWidth: '100%',
-                        maxHeight: '100%'
-                      }}
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        if (e.currentTarget.parentElement) {
-                          e.currentTarget.parentElement.textContent = 'Image not available';
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div style={{
-                      width: '250px',
-                      height: '250px',
-                      backgroundColor: '#9370DB',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: '10px',
-                      color: 'white',
-                      fontSize: '24px'
-                    }}>
-                      Icone is last hint
-                    </div>
-                  )}
-                </div>
-                <div style={{
+                  width: '100%',
                   flex: 1,
-                  maxWidth: '45%',
-                  paddingLeft: '20px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
                 }}>
-                  <h2 style={{
-                    color: '#FFD700',
-                    fontSize: '48px',
-                    marginBottom: '20px'
-                  }}>Hints</h2>
-                  <p style={{
-                    color: '#FFFFFF',
-                    fontSize: '32px',
-                    lineHeight: 1.6,
-                    marginBottom: '15px'
+                  <div style={{
+                    flex: 1,
+                    maxWidth: '45%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRight: '2px solid #FFD700',
+                    paddingRight: '20px',
                   }}>
-                    Description: {currentDailyApp.description || ''}
-                  </p>
-                  {attempts >= 1 && (
+                    
+                    {showImage && currentDailyApp.image ? (
+                      <img 
+                        src={currentDailyApp.image} 
+                        width={250} 
+                        height={250} 
+                        alt={currentDailyApp.name}
+                        style={{
+                          objectFit: 'contain',
+                          maxWidth: '100%',
+                          maxHeight: '100%'
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          if (e.currentTarget.parentElement) {
+                            e.currentTarget.parentElement.textContent = 'Image not available';
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: '250px',
+                        height: '250px',
+                        backgroundColor: '#7e5bc2',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: '10px',
+                        color: '#FFD700',
+                        fontSize: '48px'
+                      }}>
+                        {showTryAgain ? 'Try Again ->' : 'Use Hints ->'}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    flex: 1,
+                    maxWidth: '45%',
+                    paddingLeft: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                  }}>
+                    <h2 style={{
+                      color: '#FFD700',
+                      fontSize: '48px',
+                      marginBottom: '20px'
+                    }}>Hints</h2>
                     <p style={{
                       color: '#FFFFFF',
                       fontSize: '32px',
                       lineHeight: 1.6,
                       marginBottom: '15px'
                     }}>
-                      Rating: {currentDailyApp.averageRating 
-                        ? currentDailyApp.averageRating.toFixed(2) 
-                        : 'None. Be the first to Rate!'}
+                      Description: {currentDailyApp.description || ''}
                     </p>
-                  )}
+                    {attempts >= 1 && (
+                      <p style={{
+                        color: '#FFFFFF',
+                        fontSize: '32px',
+                        lineHeight: 1.6,
+                        marginBottom: '15px'
+                      }}>
+                        Rating: {currentDailyApp.averageRating 
+                          ? currentDailyApp.averageRating.toFixed(2) 
+                          : 'None. Be the first to Rate!'}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-          </div>
-      ),
-      buttons: [
-        <Button 
-          key='guess-button'
-          action="post" 
-          target={{ 
-            pathname: '/guess-app', 
-            query: { 
-              attempts: attempts + 1
-            } 
-          }} 
-        >
-          {buttonLabel}
-        </Button>
-      ],
-      textInput: "whaat?",
-  };
+            </div>
+        ),
+        buttons: [
+          <Button 
+            key='guess-button'
+            action="post" 
+            target={{ 
+              pathname: '/guess-app', 
+              query: { 
+                attempts: attempts + 1
+              } 
+            }} 
+          >
+            {buttonLabel}
+          </Button>
+        ],
+        textInput: "Enter your guess",
+    };
 });
 
 export const GET = POST;
